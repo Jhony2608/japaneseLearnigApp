@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "731849526877",
+    "project_id": "japaneselearningapp-ab71a",
+    "storage_bucket": "japaneselearningapp-ab71a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:731849526877:android:19cb8a5923b98dbe7807b4",
+        "android_client_info": {
+          "package_name": "com.antigravity.japanese_learning_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAv6n1u0SKMOm-_Dh-UIypva00gO3lHjFI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

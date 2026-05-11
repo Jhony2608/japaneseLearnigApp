@@ -1,33 +1,46 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/material.dart';
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/register_screen.dart';
+import '../../features/levels/presentation/screens/levels_map_screen.dart';
+import '../../features/auth/presentation/providers/auth_provider.dart';
 
-// Provider para GoRouter, permite inyectar dependencias de auth más adelante.
 final goRouterProvider = Provider<GoRouter>((ref) {
+  final authState = ref.watch(authStateProvider);
+
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/login',
+    redirect: (context, state) {
+      // Evitar redirecciones mientras el estado de autenticación inicial se está cargando
+      if (authState.isLoading) return null;
+
+      final isAuth = authState.value != null;
+      final isAuthScreen = state.uri.path == '/login' || state.uri.path == '/register';
+
+      // Si está autenticado y trata de acceder a login/registro, redirigir al mapa.
+      if (isAuth && isAuthScreen) {
+        return '/levels';
+      }
+      
+      // Si no está autenticado y trata de acceder a una página protegida, redirigir a login.
+      if (!isAuth && !isAuthScreen) {
+        return '/login';
+      }
+
+      return null; // Dejar que la navegación continúe.
+    },
     routes: [
       GoRoute(
-        path: '/',
-        builder: (context, state) => Scaffold(
-          appBar: AppBar(title: const Text('Fase 1: Setup')),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  '¡Arquitectura Base Configurada!',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: const Text('Botón de Prueba'),
-                )
-              ],
-            ),
-          ),
-        ),
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/levels',
+        builder: (context, state) => const LevelsMapScreen(),
       ),
     ],
   );
