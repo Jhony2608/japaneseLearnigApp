@@ -1,9 +1,10 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../features/auth/presentation/screens/login_screen.dart';
-import '../../features/auth/presentation/screens/register_screen.dart';
-import '../../features/levels/presentation/screens/levels_map_screen.dart';
-import '../../features/auth/presentation/providers/auth_provider.dart';
+import 'package:japanese_learning_app/features/auth/presentation/screens/login_screen.dart';
+import 'package:japanese_learning_app/features/auth/presentation/screens/register_screen.dart';
+import 'package:japanese_learning_app/features/levels/presentation/screens/levels_map_screen.dart';
+import 'package:japanese_learning_app/features/levels/presentation/screens/module_detail_screen.dart';
+import 'package:japanese_learning_app/features/auth/presentation/providers/auth_provider.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -41,6 +42,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/levels',
         builder: (context, state) => const LevelsMapScreen(),
+      ),
+      GoRoute(
+        path: '/module/:id',
+        builder: (context, state) {
+          final moduleId = state.pathParameters['id']!;
+          return ModuleDetailScreen(moduleId: moduleId);
+        },
       ),
     ],
   );

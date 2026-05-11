@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_profile.dart';
 import '../models/module.dart';
 import '../models/exercise.dart';
+import '../models/user_progress.dart';
 
 final firestoreProvider = Provider<FirebaseFirestore>((ref) {
   return FirebaseFirestore.instance;
@@ -40,5 +41,11 @@ class FirestoreRepository {
   Future<List<Exercise>> getExercisesByModule(String moduleId) async {
     final snapshot = await _firestore.collection('exercises').where('moduleId', isEqualTo: moduleId).get();
     return snapshot.docs.map((doc) => Exercise.fromMap(doc.data(), doc.id)).toList();
+  }
+
+  // --- Progress ---
+  Future<List<UserProgress>> getUserProgress(String userId) async {
+    final snapshot = await _firestore.collection('progress').where('userId', isEqualTo: userId).get();
+    return snapshot.docs.map((doc) => UserProgress.fromMap(doc.data(), doc.id)).toList();
   }
 }
