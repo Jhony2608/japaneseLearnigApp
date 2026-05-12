@@ -8,6 +8,7 @@ import 'package:japanese_learning_app/features/auth/presentation/providers/auth_
 import 'package:japanese_learning_app/core/data/firestore_repository.dart';
 import 'package:japanese_learning_app/features/exercises/presentation/widgets/multiple_choice_exercise.dart';
 import 'package:japanese_learning_app/features/exercises/presentation/widgets/flashcard_exercise.dart';
+import 'package:japanese_learning_app/features/exercises/presentation/widgets/drawing_exercise.dart';
 
 class ModuleDetailScreen extends ConsumerStatefulWidget {
   final String moduleId;
@@ -196,6 +197,12 @@ class _ModuleDetailScreenState extends ConsumerState<ModuleDetailScreen> {
         exercise: exercise,
         onKnewIt: _nextExercise,
         onDidNotKnowIt: _retryExercise,
+      );
+    } else if (exercise.type == 'drawing') {
+      return DrawingExercise(
+        key: ValueKey(exercise.id),
+        exercise: exercise,
+        onValid: _nextExercise,
       );
     }
     
