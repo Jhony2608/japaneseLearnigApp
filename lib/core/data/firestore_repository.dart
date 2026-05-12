@@ -48,4 +48,14 @@ class FirestoreRepository {
     final snapshot = await _firestore.collection('progress').where('userId', isEqualTo: userId).get();
     return snapshot.docs.map((doc) => UserProgress.fromMap(doc.data(), doc.id)).toList();
   }
+
+  Future<void> saveUserProgress(UserProgress progress) async {
+    final docRef = _firestore.collection('progress').doc('${progress.userId}_${progress.moduleId}');
+    await docRef.set(progress.toMap());
+  }
+
+  Future<void> addPointsToUser(String userId, int points) async {
+    final docRef = _firestore.collection('users').doc(userId);
+    await docRef.update({'totalPoints': FieldValue.increment(points)});
+  }
 }

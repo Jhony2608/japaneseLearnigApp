@@ -1,0 +1,137 @@
+import 'package:flutter/material.dart';
+import 'package:japanese_learning_app/core/models/exercise.dart';
+
+class MultipleChoiceExercise extends StatefulWidget {
+  final Exercise exercise;
+  final VoidCallback onCorrect;
+  final VoidCallback onIncorrect;
+
+  const MultipleChoiceExercise({
+    super.key,
+    required this.exercise,
+    required this.onCorrect,
+    required this.onIncorrect,
+  });
+
+  @override
+  State<MultipleChoiceExercise> createState() => _MultipleChoiceExerciseState();
+}
+
+class _MultipleChoiceExerciseState extends State<MultipleChoiceExercise> {
+  String? selectedOption;
+  bool isChecked = false;
+  late List<String> options;
+
+  @override
+  void initState() {
+    super.initState();
+    // En Firestore, correctAnswer idealmente sería un Map { "correct": "a", "options": ["a", "i", "u", "e"] }
+    // Si no es un map (porque el usuario lo creó manualmente como string), generamos opciones dummy
+    if (widget.exercise.correctAnswer is Map) {
+      final map = widget.exercise.correctAnswer as Map<String, dynamic>;
+      options = List<String>.from(map['options'] ?? []);
+      options.shuffle();
+    } else {
+      final answerStr = widget.exercise.correctAnswer.toString();
+      options = [answerStr, 'Dummy 1', 'Dummy 2', 'Dummy 3'];
+      options.shuffle();
+    }
+  }
+
+  void _checkAnswer() {
+    if (selectedOption == null) return;
+    setState(() {
+      isChecked = true;
+    });
+    
+    final correct = widget.exercise.correctAnswer is Map 
+        ? widget.exercise.correctAnswer['correct'] 
+        : widget.exercise.correctAnswer.toString();
+
+    if (selectedOption == correct) {
+      Future.delayed(const Duration(seconds: 1), widget.onCorrect);
+    } else {
+      Future.delayed(const Duration(seconds: 1), widget.onIncorrect);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final correct = widget.exercise.correctAnswer is Map 
+        ? widget.exercise.correctAnswer['correct'] 
+        : widget.exercise.correctAnswer.toString();
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          '¿Cuál es la lectura correcta?',
+          style: TextStyle(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 24),
+        Text(
+          widget.exercise.question, 
+          style: const TextStyle(fontSize: 80, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 40),
+        ...options.map((option) {
+          bool isCorrectOption = option == correct;
+          Color buttonColor = Colors.white;
+          Color textColor = Colors.black87;
+
+          if (isChecked) {
+            if (isCorrectOption) {
+              buttonColor = const Color(0xFF58CC02);
+              textColor = Colors.white;
+            } else if (option == selectedOption) {
+              buttonColor = Colors.red;
+              textColor = Colors.white;
+            }
+          } else if (option == selectedOption) {
+            buttonColor = Colors.blue.shade50;
+            textColor = Colors.blue.shade700;
+          }
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: buttonColor,
+                  foregroundColor: textColor,
+                  elevation: option == selectedOption && !isChecked ? 0 : 2,
+                  side: BorderSide(
+                    color: isChecked && isCorrectOption 
+                        ? Colors.green.shade700 
+                        : (option == selectedOption && !isChecked ? Colors.blue.shade300 : Colors.grey.shade300),
+                    width: 2,
+                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                onPressed: isChecked ? null : () {
+                  setState(() {
+                    selectedOption = option;
+                  });
+                },
+                child: Text(option, style: const TextStyle(fontSize: 20)),
+              ),
+            ),
+          );
+        }),
+        const Spacer(),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: isChecked || selectedOption == null ? null : _checkAnswer,
+            child: const Text('COMPROBAR'),
+          ),
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+}
