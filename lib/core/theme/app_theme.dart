@@ -1,30 +1,47 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static ThemeData get lightTheme {
+  // Colores principales actualizados a un estilo zen/pastel
+  static const Color primaryColor = Color(0xFF78C6A3); // Verde té matcha pastel
+  static const Color primaryDarkColor = Color(0xFF5A9B7D);
+  static const Color backgroundColor = Color(0xFFF9F9F9);
+  static const Color errorColor = Color(0xFFFF8B8B); // Rojo pastel
+  
+  static ThemeData get theme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF58CC02), // Color verde similar a Duolingo
-        brightness: Brightness.light,
+        seedColor: primaryColor,
+        background: backgroundColor,
+        primary: primaryColor,
+        error: errorColor,
       ),
+      scaffoldBackgroundColor: backgroundColor,
       appBarTheme: const AppBarTheme(
-        centerTitle: true,
+        backgroundColor: backgroundColor,
+        foregroundColor: Colors.black87,
         elevation: 0,
+        centerTitle: true,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF58CC02),
+          backgroundColor: primaryColor,
           foregroundColor: Colors.white,
+          elevation: 0, // Quitamos elevación dura por defecto
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           textStyle: const TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
           ),
         ),
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
       ),
     );
   }

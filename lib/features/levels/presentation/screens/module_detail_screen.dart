@@ -71,28 +71,52 @@ class _ModuleDetailScreenState extends ConsumerState<ModuleDetailScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('¡Módulo Completado!', textAlign: TextAlign.center),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.workspace_premium, color: Color(0xFFFFC800), size: 100),
-            const SizedBox(height: 16),
-            Text('¡Has ganado ${(exercisesList?.length ?? 0) * 10} puntos!'),
-            const SizedBox(height: 8),
-            const Text('El siguiente nivel ha sido desbloqueado.', textAlign: TextAlign.center),
-          ],
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              context.pop(); // Cerrar dialog
-              context.pop(); // Volver al mapa
-            },
-            child: const Text('CONTINUAR'),
-          ),
-        ],
+      builder: (context) => TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.0, end: 1.0),
+        duration: const Duration(milliseconds: 800),
+        curve: Curves.elasticOut,
+        builder: (context, value, child) {
+          return Transform.scale(
+            scale: value,
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              title: const Text('¡Módulo Completado!', textAlign: TextAlign.center, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Icon(Icons.star, color: Colors.orange.shade200, size: 120),
+                      const Icon(Icons.workspace_premium, color: Color(0xFFFFC800), size: 100),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '+${(exercisesList?.length ?? 0) * 10} PUNTOS',
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF58CC02)),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text('¡Excelente trabajo! El mapa se ha actualizado.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
+                ],
+              ),
+              actionsAlignment: MainAxisAlignment.center,
+              actions: [
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      context.pop(); // Cerrar dialog
+                      context.pop(); // Volver al mapa
+                    },
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF58CC02), padding: const EdgeInsets.symmetric(vertical: 16)),
+                    child: const Text('CONTINUAR'),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

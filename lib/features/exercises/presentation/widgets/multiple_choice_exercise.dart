@@ -96,7 +96,10 @@ class _MultipleChoiceExerciseState extends State<MultipleChoiceExercise> {
 
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: SizedBox(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutBack,
+              transform: Matrix4.identity()..scale(option == selectedOption ? 1.05 : 1.0),
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
@@ -117,7 +120,19 @@ class _MultipleChoiceExerciseState extends State<MultipleChoiceExercise> {
                     selectedOption = option;
                   });
                 },
-                child: Text(option, style: const TextStyle(fontSize: 20)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(option, style: const TextStyle(fontSize: 20)),
+                    if (isChecked && option == selectedOption) ...[
+                      const SizedBox(width: 8),
+                      Icon(isCorrectOption ? Icons.check_circle : Icons.cancel, size: 24),
+                    ] else if (isChecked && isCorrectOption) ...[
+                      const SizedBox(width: 8),
+                      const Icon(Icons.check_circle_outline, size: 24),
+                    ]
+                  ],
+                ),
               ),
             ),
           );

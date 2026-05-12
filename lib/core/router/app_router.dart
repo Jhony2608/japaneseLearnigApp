@@ -4,6 +4,7 @@ import 'package:japanese_learning_app/features/auth/presentation/screens/login_s
 import 'package:japanese_learning_app/features/auth/presentation/screens/register_screen.dart';
 import 'package:japanese_learning_app/features/levels/presentation/screens/levels_map_screen.dart';
 import 'package:japanese_learning_app/features/levels/presentation/screens/module_detail_screen.dart';
+import 'package:japanese_learning_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:japanese_learning_app/features/auth/presentation/providers/auth_provider.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -49,6 +50,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           final moduleId = state.pathParameters['id']!;
           return ModuleDetailScreen(moduleId: moduleId);
         },
+      ),
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfileScreen(),
       ),
     ],
   );

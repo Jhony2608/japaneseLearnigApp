@@ -14,13 +14,14 @@ class LevelsMapScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Camino de Aprendizaje'),
+        title: const Text('Camino de Aprendizaje', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
-            tooltip: 'Cerrar Sesión',
+            icon: const Icon(Icons.person_rounded, color: Color(0xFF78C6A3), size: 32),
+            onPressed: () => context.push('/profile'),
+            tooltip: 'Mi Perfil',
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: modulesAsync.when(

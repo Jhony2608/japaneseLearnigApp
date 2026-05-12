@@ -27,8 +27,8 @@ class MyApp extends ConsumerWidget {
     final goRouter = ref.watch(goRouterProvider);
 
     return MaterialApp.router(
-      title: 'Japanese Learning App',
-      theme: AppTheme.lightTheme,
+      title: 'Nihongo Master',
+      theme: AppTheme.theme,
       routerConfig: goRouter,
       debugShowCheckedModeBanner: false,
     );
