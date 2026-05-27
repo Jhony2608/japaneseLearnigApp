@@ -22,5 +22,9 @@ final userProgressProvider = FutureProvider<List<UserProgress>>((ref) async {
 
 final exercisesProvider = FutureProvider.family<List<Exercise>, String>((ref, moduleId) async {
   final repo = ref.watch(firestoreRepositoryProvider);
-  return await repo.getExercisesByModule(moduleId);
+  final exercises = await repo.getExercisesByModule(moduleId);
+  
+  // Hacemos una copia y la desordenamos aleatoriamente
+  final shuffledList = List<Exercise>.from(exercises)..shuffle();
+  return shuffledList;
 });

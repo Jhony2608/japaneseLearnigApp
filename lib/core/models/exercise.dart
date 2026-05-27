@@ -49,7 +49,7 @@ class Exercise {
       moduleId: map['moduleId'] ?? '',
       type: map['type'] ?? '',
       question: map['question'] ?? '',
-      correctAnswer: map['correctAnswer'],
+      correctAnswer: map['correctAnswer'] ?? map['answer'],
       waypoints: map['waypoints'] as List<dynamic>?,
     );
   }
