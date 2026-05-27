@@ -3,12 +3,14 @@ class Module {
   final String title;
   final String description;
   final int orderIndex; // Para el orden visual en el mapa
+  final bool isReview; // Indica si este módulo es un examen aleatorio
 
   Module({
     required this.id,
     required this.title,
     required this.description,
     this.orderIndex = 0,
+    this.isReview = false,
   });
 
   Module copyWith({
@@ -16,12 +18,14 @@ class Module {
     String? title,
     String? description,
     int? orderIndex,
+    bool? isReview,
   }) {
     return Module(
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
       orderIndex: orderIndex ?? this.orderIndex,
+      isReview: isReview ?? this.isReview,
     );
   }
 
@@ -30,6 +34,7 @@ class Module {
       'title': title,
       'description': description,
       'orderIndex': orderIndex,
+      'isReview': isReview,
     };
   }
 
@@ -39,6 +44,7 @@ class Module {
       title: map['title'] ?? '',
       description: map['description'] ?? '',
       orderIndex: map['orderIndex']?.toInt() ?? 0,
+      isReview: map['isReview'] ?? false,
     );
   }
 }

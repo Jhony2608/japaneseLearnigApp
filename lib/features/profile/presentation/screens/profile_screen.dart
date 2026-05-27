@@ -77,16 +77,23 @@ class ProfileScreen extends ConsumerWidget {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () async {
-                      // REEMPLAZA ESTE ID POR EL ID REAL DE TU PRIMER MÓDULO EN FIRESTORE
-                      const String targetModuleId = 'ZftA0Frv49pIea5eWfxG';
-                      
-                      final seedData = [
-                        Exercise(id: '', moduleId: targetModuleId, type: 'multiple_choice', question: 'あ', correctAnswer: 'a',),
-                        Exercise(id: '', moduleId: targetModuleId, type: 'multiple_choice', question: 'い', correctAnswer: 'i'),
-                        Exercise(id: '', moduleId: targetModuleId, type: 'multiple_choice', question: 'う', correctAnswer: 'u'),
-                        Exercise(id: '', moduleId: targetModuleId, type: 'multiple_choice', question: 'え', correctAnswer: 'e'),
-                        Exercise(id: '', moduleId: targetModuleId, type: 'multiple_choice', question: 'お', correctAnswer: 'o'),
+                      final String moduleId = "sLhXHV67WcKGz5NMHrkM"; // Recordatorio para poner mi ID
+
+                      final list = [
+                        {"moduleId": moduleId, "type": "drawing", "question": "あ"},
+                        {"moduleId": moduleId, "type": "drawing", "question": "い"},
+                        {"moduleId": moduleId, "type": "drawing", "question": "う"},
+                        {"moduleId": moduleId, "type": "drawing", "question": "え"},
+                        {"moduleId": moduleId, "type": "drawing", "question": "お"}
                       ];
+                      
+                      final seedData = list.map((map) => Exercise(
+                        id: '', 
+                        moduleId: map['moduleId']!, 
+                        type: map['type']!, 
+                        question: map['question']!, 
+                        correctAnswer: null
+                      )).toList();
                       
                       try {
                         await ref.read(firestoreRepositoryProvider).seedExercises(seedData);

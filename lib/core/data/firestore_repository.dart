@@ -43,6 +43,11 @@ class FirestoreRepository {
     return snapshot.docs.map((doc) => Exercise.fromMap(doc.data(), doc.id)).toList();
   }
 
+  Future<List<Exercise>> getAllExercises() async {
+    final snapshot = await _firestore.collection('exercises').get();
+    return snapshot.docs.map((doc) => Exercise.fromMap(doc.data(), doc.id)).toList();
+  }
+
   Future<void> seedExercises(List<Exercise> exercises) async {
     final batch = _firestore.batch();
     for (final ex in exercises) {
