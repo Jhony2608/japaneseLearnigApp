@@ -20,7 +20,7 @@ final userProgressProvider = FutureProvider<List<UserProgress>>((ref) async {
   return await repo.getUserProgress(userObj.uid);
 });
 
-final exercisesProvider = FutureProvider.family<List<Exercise>, String>((ref, moduleId) async {
+final exercisesProvider = FutureProvider.autoDispose.family<List<Exercise>, String>((ref, moduleId) async {
   final repo = ref.watch(firestoreRepositoryProvider);
   final exercises = await repo.getExercisesByModule(moduleId);
   

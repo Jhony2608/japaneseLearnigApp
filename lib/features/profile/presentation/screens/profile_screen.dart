@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:japanese_learning_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:japanese_learning_app/features/profile/presentation/providers/profile_provider.dart';
+import 'package:japanese_learning_app/core/data/firestore_repository.dart';
+import 'package:japanese_learning_app/core/models/exercise.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -71,6 +73,43 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
                 const Spacer(),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      // REEMPLAZA ESTE ID POR EL ID REAL DE TU PRIMER MÓDULO EN FIRESTORE
+                      const String targetModuleId = 'ZftA0Frv49pIea5eWfxG';
+                      
+                      final seedData = [
+                        Exercise(id: '', moduleId: targetModuleId, type: 'multiple_choice', question: 'あ', correctAnswer: 'a',),
+                        Exercise(id: '', moduleId: targetModuleId, type: 'multiple_choice', question: 'い', correctAnswer: 'i'),
+                        Exercise(id: '', moduleId: targetModuleId, type: 'multiple_choice', question: 'う', correctAnswer: 'u'),
+                        Exercise(id: '', moduleId: targetModuleId, type: 'multiple_choice', question: 'え', correctAnswer: 'e'),
+                        Exercise(id: '', moduleId: targetModuleId, type: 'multiple_choice', question: 'お', correctAnswer: 'o'),
+                      ];
+                      
+                      try {
+                        await ref.read(firestoreRepositoryProvider).seedExercises(seedData);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Ejercicios creados con éxito. ¡Ve a probarlos!')),
+                          );
+                        }
+                      } catch (e) {
+                        debugPrint('Error sembrando datos: $e');
+                      }
+                    },
+                    icon: const Icon(Icons.download),
+                    label: const Text('CARGAR DATOS DE PRUEBA'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(

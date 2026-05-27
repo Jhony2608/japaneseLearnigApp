@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:japanese_learning_app/core/models/exercise.dart';
 
 class MultipleChoiceExercise extends StatefulWidget {
@@ -25,11 +26,9 @@ class _MultipleChoiceExerciseState extends State<MultipleChoiceExercise> {
   @override
   void initState() {
     super.initState();
-    // En Firestore, correctAnswer idealmente sería un Map { "correct": "a", "options": ["a", "i", "u", "e"] }
-    // Si no es un map (porque el usuario lo creó manualmente como string), generamos opciones dummy
-    if (widget.exercise.correctAnswer is Map) {
-      final map = widget.exercise.correctAnswer as Map<String, dynamic>;
-      options = List<String>.from(map['options'] ?? []);
+    // Parsear string a map si el usuario lo guardó como JSON String en Firestore
+    if (widget.exercise.options != null && widget.exercise.options!.isNotEmpty) {
+      options = List<String>.from(widget.exercise.options!);
       options.shuffle();
     } else {
       final answerStr = widget.exercise.correctAnswer.toString();

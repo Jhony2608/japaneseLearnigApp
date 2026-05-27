@@ -43,6 +43,15 @@ class FirestoreRepository {
     return snapshot.docs.map((doc) => Exercise.fromMap(doc.data(), doc.id)).toList();
   }
 
+  Future<void> seedExercises(List<Exercise> exercises) async {
+    final batch = _firestore.batch();
+    for (final ex in exercises) {
+      final docRef = _firestore.collection('exercises').doc(); // Auto-generate ID
+      batch.set(docRef, ex.toMap());
+    }
+    await batch.commit();
+  }
+
   // --- Progress ---
   Future<List<UserProgress>> getUserProgress(String userId) async {
     final snapshot = await _firestore.collection('progress').where('userId', isEqualTo: userId).get();
