@@ -34,6 +34,14 @@ final exercisesProvider = FutureProvider.autoDispose.family<List<Exercise>, Stri
   if (module.isReview) {
     // Si es módulo de repaso, traemos TODO el banco de preguntas
     exercises = await repo.getAllExercises();
+  } else if (module.isCumulativeExam) {
+    // Examen de arrastre: descargamos todos y filtramos por orderIndex <= actual
+    final allExercises = await repo.getAllExercises();
+    final validModuleIds = modulesList
+        .where((m) => m.orderIndex <= module.orderIndex)
+        .map((m) => m.id)
+        .toSet();
+    exercises = allExercises.where((e) => validModuleIds.contains(e.moduleId)).toList();
   } else {
     // Si es un módulo normal, traemos solo las de su ID
     exercises = await repo.getExercisesByModule(moduleId);
@@ -42,7 +50,7 @@ final exercisesProvider = FutureProvider.autoDispose.family<List<Exercise>, Stri
   // Hacemos una copia y la desordenamos aleatoriamente
   final shuffledList = List<Exercise>.from(exercises)..shuffle();
   
-  if (module.isReview) {
+  if (module.isReview || module.isCumulativeExam) {
     // Limitar a 10 ejercicios aleatorios para el examen
     return shuffledList.take(10).toList();
   }
