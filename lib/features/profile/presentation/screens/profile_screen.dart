@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:japanese_learning_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:japanese_learning_app/features/profile/presentation/providers/profile_provider.dart';
+import 'package:japanese_learning_app/core/theme/theme_provider.dart';
 import 'package:japanese_learning_app/core/data/firestore_repository.dart';
 import 'package:japanese_learning_app/core/models/exercise.dart';
 
@@ -71,6 +72,29 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
+                ),
+                const SizedBox(height: 32),
+                // Botón de Modo Oscuro
+                Consumer(
+                  builder: (context, ref, child) {
+                    final themeMode = ref.watch(themeModeProvider);
+                    final isDark = themeMode == ThemeMode.dark;
+                    
+                    return SwitchListTile(
+                      title: const Text('Modo Oscuro', style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(isDark ? 'Activado' : 'Desactivado'),
+                      secondary: Icon(isDark ? Icons.dark_mode : Icons.light_mode, color: isDark ? const Color(0xFF78C6A3) : Colors.orange),
+                      value: isDark,
+                      activeColor: const Color(0xFF78C6A3),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(color: Theme.of(context).dividerColor),
+                      ),
+                      onChanged: (value) {
+                        ref.read(themeModeProvider.notifier).toggleTheme(value);
+                      },
+                    );
+                  },
                 ),
                 const Spacer(),
                 SizedBox(
