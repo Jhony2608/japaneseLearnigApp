@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:japanese_learning_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:japanese_learning_app/features/profile/presentation/providers/profile_provider.dart';
 import 'package:japanese_learning_app/core/theme/theme_provider.dart';
@@ -8,11 +10,36 @@ import 'package:japanese_learning_app/core/data/firestore_repository.dart';
 import 'package:japanese_learning_app/core/models/exercise.dart';
 import 'package:japanese_learning_app/core/models/module.dart';
 
-class ProfileScreen extends ConsumerWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  File? _profileImage;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        setState(() {
+          _profileImage = File(image.path);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al seleccionar imagen: $e')),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final profileAsync = ref.watch(userProfileProvider);
 
     return Scaffold(
@@ -31,11 +58,30 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                const CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Color(0xFF78C6A3),
-                  child: Icon(Icons.person, size: 50, color: Colors.white),
-                ),
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: const Color(0xFF78C6A3),
+                          backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
+                          child: _profileImage == null 
+                              ? const Icon(Icons.person, size: 50, color: Colors.white)
+                              : null,
+                        ),
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.blueAccent,
+                            shape: BoxShape.circle,
+                          ),
+                          padding: const EdgeInsets.all(8),
+                          child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                        ),
+                      ],
+                    ),
+                  ),
                 const SizedBox(height: 24),
                 Text(
                   profile.username,
@@ -47,13 +93,19 @@ class ProfileScreen extends ConsumerWidget {
                   style: const TextStyle(fontSize: 16, color: Colors.grey),
                 ),
                 const SizedBox(height: 48),
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))],
-                  ),
+                Builder(
+                  builder: (context) {
+                    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+                    return Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: isDarkMode ? Colors.grey[900] : Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        border: isDarkMode ? Border.all(color: Colors.grey[700]!, width: 1) : null,
+                        boxShadow: isDarkMode 
+                            ? null 
+                            : const [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))],
+                      ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -70,7 +122,8 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
-                ),
+                );
+              }),
                 const SizedBox(height: 32),
                 // Botón de Modo Oscuro
                 Consumer(
