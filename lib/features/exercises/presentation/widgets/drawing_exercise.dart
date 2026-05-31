@@ -3,12 +3,12 @@ import 'package:japanese_learning_app/core/models/exercise.dart';
 
 class DrawingExercise extends StatefulWidget {
   final Exercise exercise;
-  final VoidCallback onValid;
+  final void Function(bool) onEvaluated;
 
   const DrawingExercise({
     super.key,
     required this.exercise,
-    required this.onValid,
+    required this.onEvaluated,
   });
 
   @override
@@ -18,6 +18,7 @@ class DrawingExercise extends StatefulWidget {
 class _DrawingExerciseState extends State<DrawingExercise> {
   final List<List<Offset>> _strokes = [];
   List<Offset> _currentStroke = [];
+  bool _isEvaluating = false;
 
   void _startStroke(DragStartDetails details) {
     setState(() {
@@ -40,6 +41,7 @@ class _DrawingExerciseState extends State<DrawingExercise> {
     setState(() {
       _strokes.clear();
       _currentStroke = [];
+      _isEvaluating = false;
     });
   }
 
@@ -48,9 +50,9 @@ class _DrawingExerciseState extends State<DrawingExercise> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          'Dibuja el carácter',
-          style: TextStyle(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.bold),
+        Text(
+          _isEvaluating ? '¿Se parece al carácter real?' : 'Dibuja el carácter',
+          style: const TextStyle(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 24),
         // Área del Canvas
@@ -72,19 +74,22 @@ class _DrawingExerciseState extends State<DrawingExercise> {
                   style: TextStyle(
                     fontSize: 220,
                     fontWeight: FontWeight.w100,
-                    color: Colors.grey.shade200,
+                    color: _isEvaluating ? const Color(0xFF78C6A3).withOpacity(0.3) : Colors.grey.shade200,
                     height: 1.0,
                   ),
                 ),
               ),
               // Superficie interactiva de dibujo
-              GestureDetector(
-                onPanStart: _startStroke,
-                onPanUpdate: _updateStroke,
-                onPanEnd: _endStroke,
-                child: CustomPaint(
-                  painter: _DrawingPainter(strokes: _strokes),
-                  size: Size.infinite,
+              IgnorePointer(
+                ignoring: _isEvaluating,
+                child: GestureDetector(
+                  onPanStart: _startStroke,
+                  onPanUpdate: _updateStroke,
+                  onPanEnd: _endStroke,
+                  child: CustomPaint(
+                    painter: _DrawingPainter(strokes: _strokes),
+                    size: Size.infinite,
+                  ),
                 ),
               ),
             ],
@@ -92,47 +97,71 @@ class _DrawingExerciseState extends State<DrawingExercise> {
         ),
         const Spacer(),
         // Controles
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _clear,
-                icon: const Icon(Icons.delete_outline),
-                label: const Text('BORRAR'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red,
-                  side: const BorderSide(color: Colors.red, width: 2),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        if (_isEvaluating)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                  onPressed: () => widget.onEvaluated(false),
+                  child: const Text('ME EQUIVOQUÉ'),
                 ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  if (_strokes.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Dibuja algo antes de validar')),
-                    );
-                    return;
-                  }
-                  widget.onValid();
-                },
-                icon: const Icon(Icons.check),
-                label: const Text('VALIDAR'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF58CC02),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 4,
+              const SizedBox(width: 16),
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF58CC02), foregroundColor: Colors.white),
+                  onPressed: () => widget.onEvaluated(true),
+                  child: const Text('LO TRACÉ BIEN'),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          )
+        else
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _clear,
+                  icon: const Icon(Icons.delete_outline),
+                  label: const Text('BORRAR'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.red,
+                    side: const BorderSide(color: Colors.red, width: 2),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    if (_strokes.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Dibuja algo antes de validar')),
+                      );
+                      return;
+                    }
+                    setState(() {
+                      _isEvaluating = true;
+                    });
+                  },
+                  icon: const Icon(Icons.check),
+                  label: const Text('VALIDAR'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF58CC02),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: 4,
+                  ),
+                ),
+              ),
+            ],
+          ),
         const SizedBox(height: 24),
       ],
     );

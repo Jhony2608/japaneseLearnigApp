@@ -22,8 +22,13 @@ class ModuleDetailScreen extends ConsumerStatefulWidget {
 class _ModuleDetailScreenState extends ConsumerState<ModuleDetailScreen> {
   int currentIndex = 0;
   List<Exercise>? exercisesList;
+  int correctAnswers = 0;
 
-  void _nextExercise() {
+  void _advanceExercise(bool isCorrect) {
+    if (isCorrect) {
+      correctAnswers++;
+    }
+    
     if (exercisesList == null) return;
     if (currentIndex < exercisesList!.length - 1) {
       setState(() {
@@ -34,18 +39,16 @@ class _ModuleDetailScreenState extends ConsumerState<ModuleDetailScreen> {
     }
   }
 
-  void _retryExercise() {
-    // Por simplicidad en este MVP, si el usuario falla, también avanzamos.
-    // Una mecánica real lo pondría al final de la cola.
-    _nextExercise();
-  }
-
   Future<void> _completeModule() async {
-    final user = ref.read(authStateProvider).value;
-    if (user != null) {
-      final score = (exercisesList?.length ?? 0) * 10;
+    final totalExercises = exercisesList?.length ?? 0;
+    // Umbral del 80%
+    final bool isPassed = totalExercises > 0 ? (correctAnswers / totalExercises) >= 0.8 : true;
+    final int score = correctAnswers * 10;
 
-      // Guardar el progreso en Firestore
+    final user = ref.read(authStateProvider).value;
+    
+    if (isPassed && user != null) {
+      // Solo guardamos si aprueba
       final progress = UserProgress(
         id: '${user.uid}_${widget.moduleId}',
         userId: user.uid,
@@ -58,7 +61,7 @@ class _ModuleDetailScreenState extends ConsumerState<ModuleDetailScreen> {
         await ref.read(firestoreRepositoryProvider).saveUserProgress(progress);
         await ref.read(firestoreRepositoryProvider).addPointsToUser(user.uid, progress.score);
         
-        // Invalidar el provider del progreso para forzar que el mapa (Fase 4) se refresque y desbloquee el siguiente nivel
+        // Invalidar el provider del progreso para forzar que el mapa se refresque
         ref.invalidate(userProgressProvider);
       } catch (e) {
         debugPrint('Error guardando progreso: $e');
@@ -67,58 +70,106 @@ class _ModuleDetailScreenState extends ConsumerState<ModuleDetailScreen> {
 
     if (!mounted) return;
     
-    // Mostrar pantalla de éxito
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0.0, end: 1.0),
-        duration: const Duration(milliseconds: 800),
-        curve: Curves.elasticOut,
-        builder: (context, value, child) {
-          return Transform.scale(
-            scale: value,
-            child: AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-              title: const Text('¡Módulo Completado!', textAlign: TextAlign.center, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Icon(Icons.star, color: Colors.orange.shade200, size: 120),
-                      const Icon(Icons.workspace_premium, color: Color(0xFFFFC800), size: 100),
-                    ],
+    if (isPassed) {
+      // Mostrar pantalla de éxito
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.0, end: 1.0),
+          duration: const Duration(milliseconds: 800),
+          curve: Curves.elasticOut,
+          builder: (context, value, child) {
+            return Transform.scale(
+              scale: value,
+              child: AlertDialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                title: const Text('¡Módulo Completado!', textAlign: TextAlign.center, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Icon(Icons.star, color: Colors.orange.shade200, size: 120),
+                        const Icon(Icons.workspace_premium, color: Color(0xFFFFC800), size: 100),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Puntuación: $correctAnswers / $totalExercises',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '+$score PUNTOS',
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF58CC02)),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text('¡Excelente trabajo! El mapa se ha actualizado.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
+                  ],
+                ),
+                actionsAlignment: MainAxisAlignment.center,
+                actions: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        context.pop(); // Cerrar dialog
+                        context.pop(); // Volver al mapa
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF58CC02), padding: const EdgeInsets.symmetric(vertical: 16)),
+                      child: const Text('CONTINUAR'),
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    '+${(exercisesList?.length ?? 0) * 10} PUNTOS',
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF58CC02)),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text('¡Excelente trabajo! El mapa se ha actualizado.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
                 ],
               ),
-              actionsAlignment: MainAxisAlignment.center,
-              actions: [
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      context.pop(); // Cerrar dialog
-                      context.pop(); // Volver al mapa
-                    },
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF58CC02), padding: const EdgeInsets.symmetric(vertical: 16)),
-                    child: const Text('CONTINUAR'),
-                  ),
-                ),
-              ],
+            );
+          },
+        ),
+      );
+    } else {
+      // Mostrar pantalla de fallo
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('Módulo Suspendido', textAlign: TextAlign.center, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.sentiment_dissatisfied_rounded, color: Colors.redAccent, size: 100),
+              const SizedBox(height: 16),
+              Text(
+                'Aciertos: $correctAnswers / $totalExercises',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Necesitas al menos un 80% de aciertos para aprobar este módulo.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  context.pop(); // Cerrar dialog
+                  context.pop(); // Volver al mapa (para que lo reintente entrando de nuevo)
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, padding: const EdgeInsets.symmetric(vertical: 16)),
+                child: const Text('VOLVER AL MAPA'),
+              ),
             ),
-          );
-        },
-      ),
-    );
+          ],
+        ),
+      );
+    }
   }
 
   @override
@@ -164,7 +215,10 @@ class _ModuleDetailScreenState extends ConsumerState<ModuleDetailScreen> {
                   const Text('No hay ejercicios en este módulo.'),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: _completeModule, 
+                    onPressed: () {
+                      correctAnswers = exercises.length;
+                      _completeModule();
+                    }, 
                     child: const Text('Simular Completar Módulo')
                   ),
                 ],
@@ -207,26 +261,25 @@ class _ModuleDetailScreenState extends ConsumerState<ModuleDetailScreen> {
   }
 
   Widget _buildExerciseWidget(Exercise exercise) {
-    // Usamos Keys para forzar que el widget se reconstruya si el estado cambia pero el tipo de widget es el mismo
     if (exercise.type == 'multiple_choice') {
       return MultipleChoiceExercise(
         key: ValueKey(exercise.id),
         exercise: exercise,
-        onCorrect: _nextExercise,
-        onIncorrect: _retryExercise,
+        onCorrect: () => _advanceExercise(true),
+        onIncorrect: () => _advanceExercise(false),
       );
     } else if (exercise.type == 'flashcard') {
       return FlashcardExercise(
         key: ValueKey(exercise.id),
         exercise: exercise,
-        onKnewIt: _nextExercise,
-        onDidNotKnowIt: _retryExercise,
+        onKnewIt: () => _advanceExercise(true),
+        onDidNotKnowIt: () => _advanceExercise(false),
       );
     } else if (exercise.type == 'drawing') {
       return DrawingExercise(
         key: ValueKey(exercise.id),
         exercise: exercise,
-        onValid: _nextExercise,
+        onEvaluated: (isCorrect) => _advanceExercise(isCorrect),
       );
     }
     
@@ -236,7 +289,7 @@ class _ModuleDetailScreenState extends ConsumerState<ModuleDetailScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text('Tipo de ejercicio desconocido: ${exercise.type}'),
-          ElevatedButton(onPressed: _nextExercise, child: const Text('Saltar Ejercicio')),
+          ElevatedButton(onPressed: () => _advanceExercise(false), child: const Text('Saltar Ejercicio')),
         ],
       ),
     );
