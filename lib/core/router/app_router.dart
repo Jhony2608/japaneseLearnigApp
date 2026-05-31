@@ -5,6 +5,7 @@ import 'package:japanese_learning_app/features/auth/presentation/screens/registe
 import 'package:japanese_learning_app/features/levels/presentation/screens/levels_map_screen.dart';
 import 'package:japanese_learning_app/features/levels/presentation/screens/module_detail_screen.dart';
 import 'package:japanese_learning_app/features/profile/presentation/screens/profile_screen.dart';
+import 'package:japanese_learning_app/features/navigation/presentation/screens/main_navigation_screen.dart';
 import 'package:japanese_learning_app/features/auth/presentation/providers/auth_provider.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -42,7 +43,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/levels',
-        builder: (context, state) => const LevelsMapScreen(),
+        builder: (context, state) => const MainNavigationScreen(),
       ),
       GoRoute(
         path: '/module/:id',

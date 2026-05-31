@@ -6,6 +6,7 @@ import 'package:japanese_learning_app/features/profile/presentation/providers/pr
 import 'package:japanese_learning_app/core/theme/theme_provider.dart';
 import 'package:japanese_learning_app/core/data/firestore_repository.dart';
 import 'package:japanese_learning_app/core/models/exercise.dart';
+import 'package:japanese_learning_app/core/models/module.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -17,10 +18,6 @@ class ProfileScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mi Perfil'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
       ),
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -28,11 +25,12 @@ class ProfileScreen extends ConsumerWidget {
         data: (profile) {
           if (profile == null) return const Center(child: Text('No se encontró el perfil'));
 
-          return Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
                 const CircleAvatar(
                   radius: 50,
                   backgroundColor: Color(0xFF78C6A3),
@@ -96,34 +94,163 @@ class ProfileScreen extends ConsumerWidget {
                     );
                   },
                 ),
-                const Spacer(),
+                const SizedBox(height: 32),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () async {
-                      final String moduleId = "sLhXHV67WcKGz5NMHrkM"; // Recordatorio para poner mi ID
+                      final repo = ref.read(firestoreRepositoryProvider);
 
-                      final list = [
-                        {"moduleId": moduleId, "type": "drawing", "question": "あ"},
-                        {"moduleId": moduleId, "type": "drawing", "question": "い"},
-                        {"moduleId": moduleId, "type": "drawing", "question": "う"},
-                        {"moduleId": moduleId, "type": "drawing", "question": "え"},
-                        {"moduleId": moduleId, "type": "drawing", "question": "お"}
+                      // --- Fila H ---
+                      final m21 = Module(id: '', title: 'Hiragana: Fila H 1', description: 'Introducción a la Fila H del silabario.', orderIndex: 21, isCumulativeExam: false);
+                      final e21 = [
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'は', correctAnswer: 'ha'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'ひ', correctAnswer: 'hi'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'ふ', correctAnswer: 'fu'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'へ', correctAnswer: 'he'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'ほ', correctAnswer: 'ho'),
                       ];
-                      
-                      final seedData = list.map((map) => Exercise(
-                        id: '', 
-                        moduleId: map['moduleId']!, 
-                        type: map['type']!, 
-                        question: map['question']!, 
-                        correctAnswer: null
-                      )).toList();
-                      
+                      final m22 = Module(id: '', title: 'Hiragana: Fila H 2', description: 'Práctica de lectura para la Fila H.', orderIndex: 22, isCumulativeExam: false);
+                      final e22 = [
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'ha', correctAnswer: 'は', options: ['ほ', 'は', 'け', 'ひ']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'hi', correctAnswer: 'ひ', options: ['い', 'ふ', 'ひ', 'へ']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'fu', correctAnswer: 'ふ', options: ['ほ', 'ふ', 'は', 'へ']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'he', correctAnswer: 'へ', options: ['く', 'へ', 'ひ', 'ほ']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'ho', correctAnswer: 'ほ', options: ['は', 'ま', 'ほ', 'ふ']),
+                      ];
+                      final m23 = Module(id: '', title: 'Hiragana: Fila H 3', description: 'Aprende a escribir correctamente la Fila H.', orderIndex: 23, isCumulativeExam: false);
+                      final e23 = [
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'は', correctAnswer: 'ha'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'ひ', correctAnswer: 'hi'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'ふ', correctAnswer: 'fu'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'へ', correctAnswer: 'he'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'ほ', correctAnswer: 'ho'),
+                      ];
+                      final m24 = Module(id: '', title: 'Hiragana: Fila H Repaso', description: 'Examen acumulativo de todo lo aprendido hasta la Fila H.', orderIndex: 24, isCumulativeExam: true);
+                      final e24 = <Exercise>[];
+
+                      // --- Fila M ---
+                      final m25 = Module(id: '', title: 'Hiragana: Fila M 1', description: 'Introducción a la Fila M del silabario.', orderIndex: 25, isCumulativeExam: false);
+                      final e25 = [
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'ま', correctAnswer: 'ma'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'み', correctAnswer: 'mi'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'む', correctAnswer: 'mu'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'め', correctAnswer: 'me'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'も', correctAnswer: 'mo'),
+                      ];
+                      final m26 = Module(id: '', title: 'Hiragana: Fila M 2', description: 'Práctica de lectura para la Fila M.', orderIndex: 26, isCumulativeExam: false);
+                      final e26 = [
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'ma', correctAnswer: 'ま', options: ['ほ', 'も', 'ま', 'む']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'mi', correctAnswer: 'み', options: ['み', 'む', 'め', 'ま']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'mu', correctAnswer: 'む', options: ['み', 'め', 'む', 'も']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'me', correctAnswer: 'め', options: ['ぬ', 'め', 'あ', 'ま']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'mo', correctAnswer: 'も', options: ['ま', 'し', 'も', 'む']),
+                      ];
+                      final m27 = Module(id: '', title: 'Hiragana: Fila M 3', description: 'Aprende a escribir correctamente la Fila M.', orderIndex: 27, isCumulativeExam: false);
+                      final e27 = [
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'ま', correctAnswer: 'ma'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'み', correctAnswer: 'mi'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'む', correctAnswer: 'mu'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'め', correctAnswer: 'me'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'も', correctAnswer: 'mo'),
+                      ];
+                      final m28 = Module(id: '', title: 'Hiragana: Fila M Repaso', description: 'Examen acumulativo de todo lo aprendido hasta la Fila M.', orderIndex: 28, isCumulativeExam: true);
+                      final e28 = <Exercise>[];
+
+                      // --- Fila Y ---
+                      final m29 = Module(id: '', title: 'Hiragana: Fila Y 1', description: 'Introducción a la Fila Y del silabario.', orderIndex: 29, isCumulativeExam: false);
+                      final e29 = [
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'や', correctAnswer: 'ya'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'ゆ', correctAnswer: 'yu'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'よ', correctAnswer: 'yo'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'や', correctAnswer: 'ya'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'よ', correctAnswer: 'yo'),
+                      ];
+                      final m30 = Module(id: '', title: 'Hiragana: Fila Y 2', description: 'Práctica de lectura para la Fila Y.', orderIndex: 30, isCumulativeExam: false);
+                      final e30 = [
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'ya', correctAnswer: 'や', options: ['ゆ', 'や', 'か', 'よ']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'yu', correctAnswer: 'ゆ', options: ['め', 'ゆ', 'よ', 'や']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'yo', correctAnswer: 'よ', options: ['ま', 'ゆ', 'よ', 'や']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'ya', correctAnswer: 'や', options: ['ち', 'よ', 'や', 'ゆ']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'yu', correctAnswer: 'ゆ', options: ['ゆ', 'ぬ', 'よ', 'や']),
+                      ];
+                      final m31 = Module(id: '', title: 'Hiragana: Fila Y 3', description: 'Aprende a escribir correctamente la Fila Y.', orderIndex: 31, isCumulativeExam: false);
+                      final e31 = [
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'や', correctAnswer: 'ya'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'ゆ', correctAnswer: 'yu'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'よ', correctAnswer: 'yo'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'や', correctAnswer: 'ya'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'ゆ', correctAnswer: 'yu'),
+                      ];
+                      final m32 = Module(id: '', title: 'Hiragana: Fila Y Repaso', description: 'Examen acumulativo de todo lo aprendido hasta la Fila Y.', orderIndex: 32, isCumulativeExam: true);
+                      final e32 = <Exercise>[];
+
+                      // --- Fila R ---
+                      final m33 = Module(id: '', title: 'Hiragana: Fila R 1', description: 'Introducción a la Fila R del silabario.', orderIndex: 33, isCumulativeExam: false);
+                      final e33 = [
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'ら', correctAnswer: 'ra'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'り', correctAnswer: 'ri'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'る', correctAnswer: 'ru'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'れ', correctAnswer: 're'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'ろ', correctAnswer: 'ro'),
+                      ];
+                      final m34 = Module(id: '', title: 'Hiragana: Fila R 2', description: 'Práctica de lectura para la Fila R.', orderIndex: 34, isCumulativeExam: false);
+                      final e34 = [
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'ra', correctAnswer: 'ら', options: ['ち', 'ら', 'ろ', 'る']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'ri', correctAnswer: 'り', options: ['い', 'る', 'り', 'れ']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'ru', correctAnswer: 'る', options: ['ろ', 'る', 'ら', 'れ']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 're', correctAnswer: 'れ', options: ['ね', 'れ', 'わ', 'る']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'ro', correctAnswer: 'ろ', options: ['る', 'ら', 'ろ', 'り']),
+                      ];
+                      final m35 = Module(id: '', title: 'Hiragana: Fila R 3', description: 'Aprende a escribir correctamente la Fila R.', orderIndex: 35, isCumulativeExam: false);
+                      final e35 = [
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'ら', correctAnswer: 'ra'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'り', correctAnswer: 'ri'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'る', correctAnswer: 'ru'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'れ', correctAnswer: 're'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'ろ', correctAnswer: 'ro'),
+                      ];
+                      final m36 = Module(id: '', title: 'Hiragana: Fila R Repaso', description: 'Examen acumulativo de todo lo aprendido hasta la Fila R.', orderIndex: 36, isCumulativeExam: true);
+                      final e36 = <Exercise>[];
+
+                      // --- Fila W / N ---
+                      final m37 = Module(id: '', title: 'Hiragana: Fila W 1', description: 'Introducción a la Fila W y carácter final N.', orderIndex: 37, isCumulativeExam: false);
+                      final e37 = [
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'わ', correctAnswer: 'wa'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'を', correctAnswer: 'wo'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'ん', correctAnswer: 'n'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'わ', correctAnswer: 'wa'),
+                        Exercise(id: '', moduleId: '', type: 'flashcard', question: 'ん', correctAnswer: 'n'),
+                      ];
+                      final m38 = Module(id: '', title: 'Hiragana: Fila W 2', description: 'Práctica de lectura para la Fila W y N.', orderIndex: 38, isCumulativeExam: false);
+                      final e38 = [
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'wa', correctAnswer: 'わ', options: ['れ', 'ね', 'わ', 'を']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'wo', correctAnswer: 'を', options: ['わ', 'を', 'ち', 'ん']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'n', correctAnswer: 'ん', options: ['ん', 'ソ', 'わ', 'を']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'wa', correctAnswer: 'わ', options: ['わ', 'を', 'ん', 'ね']),
+                        Exercise(id: '', moduleId: '', type: 'multiple_choice', question: 'wo', correctAnswer: 'を', options: ['て', 'ん', 'わ', 'を']),
+                      ];
+                      final m39 = Module(id: '', title: 'Hiragana: Fila W 3', description: 'Aprende a escribir correctamente la Fila W y N.', orderIndex: 39, isCumulativeExam: false);
+                      final e39 = [
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'わ', correctAnswer: 'wa'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'を', correctAnswer: 'wo'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'ん', correctAnswer: 'n'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'わ', correctAnswer: 'wa'),
+                        Exercise(id: '', moduleId: '', type: 'drawing', question: 'ん', correctAnswer: 'n'),
+                      ];
+                      final m40 = Module(id: '', title: 'Hiragana: Repaso Final', description: '¡Gran examen final! Demuestra tu dominio absoluto del Hiragana.', orderIndex: 40, isCumulativeExam: true);
+                      final e40 = <Exercise>[];
+
                       try {
-                        await ref.read(firestoreRepositoryProvider).seedExercises(seedData);
+                        await repo.seedCompleteModule(m21, e21); await repo.seedCompleteModule(m22, e22); await repo.seedCompleteModule(m23, e23); await repo.seedCompleteModule(m24, e24);
+                        await repo.seedCompleteModule(m25, e25); await repo.seedCompleteModule(m26, e26); await repo.seedCompleteModule(m27, e27); await repo.seedCompleteModule(m28, e28);
+                        await repo.seedCompleteModule(m29, e29); await repo.seedCompleteModule(m30, e30); await repo.seedCompleteModule(m31, e31); await repo.seedCompleteModule(m32, e32);
+                        await repo.seedCompleteModule(m33, e33); await repo.seedCompleteModule(m34, e34); await repo.seedCompleteModule(m35, e35); await repo.seedCompleteModule(m36, e36);
+                        await repo.seedCompleteModule(m37, e37); await repo.seedCompleteModule(m38, e38); await repo.seedCompleteModule(m39, e39); await repo.seedCompleteModule(m40, e40);
+
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Ejercicios creados con éxito. ¡Ve a probarlos!')),
+                            const SnackBar(content: Text('¡Se inyectaron 20 módulos de Hiragana de un solo golpe!')),
                           );
                         }
                       } catch (e) {
@@ -158,7 +285,7 @@ class ProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
               ],
             ),
-          );
+          ));
         },
       ),
     );

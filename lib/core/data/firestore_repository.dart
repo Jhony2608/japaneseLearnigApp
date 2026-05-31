@@ -57,6 +57,26 @@ class FirestoreRepository {
     await batch.commit();
   }
 
+  Future<void> seedCompleteModule(Module module, List<Exercise> exercises) async {
+    final batch = _firestore.batch();
+    
+    // Generar ID del módulo
+    final moduleDocRef = _firestore.collection('modules').doc();
+    
+    // Añadir el módulo al batch
+    final moduleWithId = module.copyWith(id: moduleDocRef.id);
+    batch.set(moduleDocRef, moduleWithId.toMap());
+
+    // Añadir los ejercicios al batch vinculados al nuevo moduleId
+    for (final ex in exercises) {
+      final exerciseDocRef = _firestore.collection('exercises').doc();
+      final exerciseWithModuleId = ex.copyWith(moduleId: moduleDocRef.id, id: exerciseDocRef.id);
+      batch.set(exerciseDocRef, exerciseWithModuleId.toMap());
+    }
+
+    await batch.commit();
+  }
+
   // --- Progress ---
   Future<List<UserProgress>> getUserProgress(String userId) async {
     final snapshot = await _firestore.collection('progress').where('userId', isEqualTo: userId).get();
