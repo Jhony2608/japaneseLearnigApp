@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:japanese_learning_app/features/levels/presentation/screens/levels_map_screen.dart';
 import 'package:japanese_learning_app/features/dictionary/presentation/screens/dictionary_screen.dart';
+import 'package:japanese_learning_app/features/store/presentation/screens/premium_checkout_screen.dart';
 import 'package:japanese_learning_app/features/profile/presentation/screens/profile_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -16,29 +17,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _screens = [
     const LevelsMapScreen(),
     const DictionaryScreen(),
-    const SizedBox(), 
+    const PremiumCheckoutScreen(), 
     const ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {
-    if (index == 2) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Próximamente', style: TextStyle(fontWeight: FontWeight.bold)),
-          content: const Text('La pasarela de pagos y tienda de vidas extra estará disponible en futuras actualizaciones.'),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Entendido', style: TextStyle(color: Color(0xFF78C6A3))),
-            ),
-          ],
-        ),
-      );
-      return; 
-    }
-
     setState(() {
       _currentIndex = index;
     });
